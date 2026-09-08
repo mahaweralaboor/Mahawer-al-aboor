@@ -134,7 +134,8 @@
     sending: { en: "Sending...", ar: "جاري الإرسال..." },
     success: { en: "Your quote request was sent successfully!", ar: "تم إرسال طلبك بنجاح!" },
     error: { en: "Something went wrong. Please try again.", ar: "حدث خطأ، حاول مرة أخرى." },
-    fixErrors: { en: "Please check the highlighted fields.", ar: "يرجى مراجعة الحقول المحددة." }
+    fixErrors: { en: "Please check the highlighted fields.", ar: "يرجى مراجعة الحقول المحددة." },
+    captcha: { en: "Please complete the CAPTCHA before sending.", ar: "يرجى إكمال اختبار التحقق قبل الإرسال." }
   };
 
   var STORAGE_KEY = "mahawer-lang";
@@ -268,12 +269,20 @@
           return;
         }
 
+        var captchaResponse = form.querySelector('textarea[name="h-captcha-response"]');
+        var captchaToken = captchaResponse ? captchaResponse.value.trim() : "";
+        if (!captchaToken){
+          if (statusEl) statusEl.textContent = statusMsgs.captcha[lang];
+          return;
+        }
+
         var submitButton = form.querySelector('button[type="submit"]');
         var honeypot = form.elements.botcheck;
         if (honeypot && honeypot.checked) return;
 
         var formData = new FormData(form);
         formData.set("replyto", document.getElementById("q-email").value.trim());
+        formData.set("h-captcha-response", captchaToken);
         isSubmitting = true;
         if (statusEl) statusEl.textContent = statusMsgs.sending[lang];
         if (submitButton) submitButton.disabled = true;
